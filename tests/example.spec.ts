@@ -1,26 +1,23 @@
 import { test, expect } from '@playwright/test';
 
-// ✅ Test 1: Check that the Apple homepage has "Apple" in the title
-test('homepage has title', async ({ page }) => {
-  // Go to Apple’s homepage
-  await page.goto('https://www.apple.com/');
+test('full shopping flow', async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');
+  await page.fill('#user-name', 'standard_user');
+  await page.fill('#password', 'secret_sauce');
+  await page.click('#login-button');
 
-  // Expect the title to include the word “Apple”
-  await expect(page).toHaveTitle(/Apple/);
+  await page.locator('#add-to-cart-sauce-labs-backpack').click();
+  await page.locator('.shopping_cart_link').click();
+  await page.locator('#checkout').click();
+
+  await page.fill('#first-name', 'Robin');
+  await page.fill('#last-name', 'Ng');
+  await page.fill('#postal-code', '2009');
+  await page.locator('#continue').click();
+
+  await page.locator('#finish').click();
+  await expect(page).toHaveURL(/.*checkout-complete.html/);
+  await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+
+  await page.screenshot({ path: 'checkout-success.png', fullPage: true });
 });
-
-// ✅ Test 2: Check that the “Mac” link works
-test('navigate to Mac section', async ({ page }) => {
-  await page.goto('https://www.apple.com/');
-
-  // Locate the global navigation bar
-  const nav = page.locator('nav.globalnav');
-
-  // Click the first Mac link inside the top nav
-  await nav.getByRole('link', { name: 'Mac' }).first().click();
-
-  // Verify navigation worked
-  await expect(page).toHaveTitle(/Mac/);
-});
-
-
